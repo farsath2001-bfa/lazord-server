@@ -6,7 +6,7 @@ const propertySchema = new mongoose.Schema({
     required: [true, 'Property title is required'],
     trim: true
   },
-  type: {
+ type: {
   type: String,
   enum: ['Buy', 'Rent', 'Off Plan', 'Sell', 'Commercial'],
   required: [true, 'Property type is required']
