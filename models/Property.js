@@ -7,10 +7,10 @@ const propertySchema = new mongoose.Schema({
     trim: true
   },
   type: {
-    type: String,
-    enum: ['Buy', 'Rent', 'Off Plan'],
-    required: [true, 'Property type is required']
-  },
+  type: String,
+  enum: ['Buy', 'Rent', 'Off Plan', 'Sell', 'Commercial'],
+  required: [true, 'Property type is required']
+},
   category: {
     type: String,
     enum: ['Apartment', 'Villa', 'Penthouse', 'Townhouse', 'Studio', 'Commercial'],
