@@ -36,11 +36,11 @@ const leadSchema = new mongoose.Schema({
     enum: ['New', 'Contacted', 'In Progress', 'Closed', 'Lost'],
     default: 'New'
   },
-  source: {
-    type: String,
-    enum: ['Contact Form', 'Property Inquiry', 'WhatsApp', 'Phone', 'Walk In'],
-    default: 'Contact Form'
-  },
+ source: {
+  type: String,
+  enum: ['Contact Form', 'Property Inquiry', 'WhatsApp', 'Phone', 'Walk In', 'Website Popup'],
+  default: 'Contact Form'
+},
   assignedAgent: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
