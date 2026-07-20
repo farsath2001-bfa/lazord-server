@@ -30,6 +30,14 @@ app.get('/', (req, res) => {
   res.json({ message: '✅ Lazord Real Estate API is running', status: 'OK' })
 })
 
+// ── Keep Render free tier awake (ping every 14 minutes) ──
+const BACKEND_URL = process.env.RENDER_URL || 'https://lazord-server.onrender.com'
+setInterval(() => {
+  fetch(BACKEND_URL)
+    .then(() => console.log('✅ Keep-alive ping sent'))
+    .catch(err => console.log('⚠️ Keep-alive ping failed:', err.message))
+}, 14 * 60 * 1000)
+
 // MongoDB connection + Start server
 const PORT = process.env.PORT || 5000
 
