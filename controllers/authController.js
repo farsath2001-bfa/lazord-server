@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken')
 
 // Generate JWT token
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' })
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '45d' })
 }
 
 // @desc    Register admin/agent

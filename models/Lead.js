@@ -6,12 +6,18 @@ const leadSchema = new mongoose.Schema({
     required: [true, 'Name is required'],
     trim: true
   },
-  email: {
-    type: String,
-    required: [true, 'Email is required'],
-    lowercase: true,
-    trim: true
-  },
+email: {
+  type: String,
+  required: [true, 'Email is required'],
+  lowercase: true,
+  trim: true,
+  validate: {
+    validator: function(v) {
+      return /\S+@\S+\.\S+/.test(v) || v === 'n/a'
+    },
+    message: 'Invalid email'
+  }
+},
   phone: {
     type: String,
     required: [true, 'Phone is required'],
@@ -39,6 +45,7 @@ const leadSchema = new mongoose.Schema({
  source: {
   type: String,
   enum: ['Contact Form', 'Property Inquiry', 'WhatsApp', 'Phone', 'Walk In', 'Website Popup'],
+
   default: 'Contact Form'
 },
   assignedAgent: {

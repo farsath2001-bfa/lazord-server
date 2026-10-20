@@ -10,8 +10,20 @@ dotenv.config()
 const app = express()
 
 // Middleware
+// CLIENT_URL may hold several comma-separated origins. Local dev (5173) and
+// `vite preview` (4173) are always allowed so a local build can reach the API.
+const allowedOrigins = [
+  ...(process.env.CLIENT_URL || '').split(',').map(o => o.trim().replace(/\/$/, '')).filter(Boolean),
+  'http://localhost:5173',
+  'http://localhost:4173',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:4173',
+]
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: (origin, cb) => {
+    if (!origin || allowedOrigins.includes(origin)) return cb(null, true)
+    return cb(null, false)
+  },
   credentials: true
 }))
 app.use(express.json())
