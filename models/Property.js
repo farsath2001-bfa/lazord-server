@@ -56,6 +56,10 @@ const propertySchema = new mongoose.Schema({
   gallery: [{
     type: String
   }],
+  videoUrl: {
+    type: String,
+    trim: true
+  },
   featured: {
     type: Boolean,
     default: false
