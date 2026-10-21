@@ -36,6 +36,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 app.use('/api/properties', require('./routes/propertyRoutes'))
 app.use('/api/auth',       require('./routes/authRoutes'))
 app.use('/api/leads',      require('./routes/leadRoutes'))
+app.use('/api/posts',      require('./routes/postRoutes'))
 
 // Health check
 app.get('/', (req, res) => {
