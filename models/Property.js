@@ -60,6 +60,11 @@ const propertySchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  agent: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Agent',
+    default: null
+  },
   featured: {
     type: Boolean,
     default: false

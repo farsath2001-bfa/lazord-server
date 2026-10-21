@@ -21,7 +21,7 @@ const getLeads = async (req, res) => {
 
     const leads = await Lead.find(query)
       .populate('property', 'title location price')
-      .populate('assignedAgent', 'name email')
+      .populate('assignedAgent', 'name phone whatsapp')
       .sort({ createdAt: -1 })
 
     res.json({ success: true, count: leads.length, data: leads })

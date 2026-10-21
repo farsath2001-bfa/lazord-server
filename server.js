@@ -37,6 +37,7 @@ app.use('/api/properties', require('./routes/propertyRoutes'))
 app.use('/api/auth',       require('./routes/authRoutes'))
 app.use('/api/leads',      require('./routes/leadRoutes'))
 app.use('/api/posts',      require('./routes/postRoutes'))
+app.use('/api/agents',     require('./routes/agentRoutes'))
 
 // Health check
 app.get('/', (req, res) => {

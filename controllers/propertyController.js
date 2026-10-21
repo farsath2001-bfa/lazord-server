@@ -54,6 +54,7 @@ const getProperties = async (req, res) => {
 const getPropertyById = async (req, res) => {
   try {
     const property = await Property.findById(req.params.id)
+      .populate('agent', 'name title phone whatsapp photo languages')
     if (!property) {
       return res.status(404).json({ success: false, message: 'Property not found' })
     }

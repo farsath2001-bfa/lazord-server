@@ -50,7 +50,11 @@ email: {
 },
   assignedAgent: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Agent',
+    default: null
+  },
+  followUpAt: {
+    type: Date,
     default: null
   },
   notes: {
