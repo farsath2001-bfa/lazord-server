@@ -1,8 +1,10 @@
 const Lead = require('../models/Lead')
+const logActivity = require('../utils/logActivity')
 
 const createLead = async (req, res) => {
   try {
     const lead = await Lead.create(req.body)
+    logActivity(req, 'received', 'lead', `${lead.name} (${lead.source || 'Website'})`)
     res.status(201).json({ success: true, data: lead })
   } catch (error) {
     res.status(400).json({ success: false, message: error.message })
@@ -43,6 +45,8 @@ const updateLead = async (req, res) => {
     if (!lead) {
       return res.status(404).json({ success: false, message: 'Lead not found' })
     }
+    const changes = Object.keys(req.body).map(k => (k === 'status' ? `status → ${req.body.status}` : k)).join(', ')
+    logActivity(req, 'updated', 'lead', `${lead.name}: ${changes}`)
     res.json({ success: true, data: lead })
   } catch (error) {
     res.status(400).json({ success: false, message: error.message })
@@ -58,6 +62,7 @@ const deleteLead = async (req, res) => {
     if (!lead) {
       return res.status(404).json({ success: false, message: 'Lead not found' })
     }
+    logActivity(req, 'deleted', 'lead', lead.name)
     res.json({ success: true, message: 'Lead deleted successfully' })
   } catch (error) {
     res.status(500).json({ success: false, message: error.message })
