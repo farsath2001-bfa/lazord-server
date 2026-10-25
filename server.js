@@ -54,6 +54,7 @@ app.use('/api/agents',     require('./routes/agentRoutes'))
 app.use('/api/activity',   require('./routes/activityRoutes'))
 app.use('/api/reports',    require('./routes/reportRoutes'))
 app.use('/api/upload',     require('./routes/uploadRoutes'))
+app.use('/api',            require('./routes/sitemapRoutes'))
 
 // Health check
 app.get('/', (req, res) => {
