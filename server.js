@@ -3,11 +3,18 @@ const mongoose = require('mongoose')
 const cors = require('cors')
 const dotenv = require('dotenv')
 const path = require('path')
+const helmet = require('helmet')
+const rateLimit = require('express-rate-limit')
 
 // Load env variables
 dotenv.config()
 
 const app = express()
+
+// Render sits behind a proxy; needed so rate limiting sees the real visitor IP
+app.set('trust proxy', 1)
+// Security headers (images are served to the Vercel site, so allow cross-origin loads)
+app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }))
 
 // Middleware
 // CLIENT_URL may hold several comma-separated origins. Local dev (5173) and
@@ -29,6 +36,12 @@ app.use(cors({
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
+// Rate limits: generous for normal browsing, strict for login and public enquiry forms
+const limiter = (limit) => rateLimit({ windowMs: 15 * 60 * 1000, limit, standardHeaders: true, legacyHeaders: false, message: { success: false, message: 'Too many requests, please try again later' } })
+app.use('/api', limiter(600))
+app.use('/api/auth/login', limiter(10))
+app.post('/api/leads', limiter(20))
+
 // Static folder for uploaded images
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
@@ -39,6 +52,8 @@ app.use('/api/leads',      require('./routes/leadRoutes'))
 app.use('/api/posts',      require('./routes/postRoutes'))
 app.use('/api/agents',     require('./routes/agentRoutes'))
 app.use('/api/activity',   require('./routes/activityRoutes'))
+app.use('/api/reports',    require('./routes/reportRoutes'))
+app.use('/api/upload',     require('./routes/uploadRoutes'))
 
 // Health check
 app.get('/', (req, res) => {

@@ -1,0 +1,25 @@
+name: Daily database backup
+
+on:
+  schedule:
+    - cron: '30 21 * * *'   # 01:30 Dubai time
+  workflow_dispatch: {}      # also lets you run it by hand from the Actions tab
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: node scripts/backup.js
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lazord-db-backup
+          path: backups/*.json.gz
+          retention-days: 30

@@ -1,9 +1,18 @@
 const Lead = require('../models/Lead')
+const Agent = require('../models/Agent')
 const logActivity = require('../utils/logActivity')
+
+// Public enquiry forms may only set these fields (never status, notes or assignment).
+const PUBLIC_FIELDS = ['name', 'email', 'phone', 'service', 'message', 'property', 'source']
+const pickPublic = (body) => {
+  const out = {}
+  PUBLIC_FIELDS.forEach(k => { if (body[k] !== undefined) out[k] = body[k] })
+  return out
+}
 
 const createLead = async (req, res) => {
   try {
-    const lead = await Lead.create(req.body)
+    const lead = await Lead.create(pickPublic(req.body))
     logActivity(req, 'received', 'lead', `${lead.name} (${lead.source || 'Website'})`)
     res.status(201).json({ success: true, data: lead })
   } catch (error) {
@@ -18,6 +27,11 @@ const getLeads = async (req, res) => {
   try {
     const { status, source } = req.query
     let query = {}
+    if (req.user && req.user.role === 'agent') {
+      const me = await Agent.findOne({ user: req.user._id })
+      if (!me) return res.json({ success: true, count: 0, data: [] })
+      query.assignedAgent = me._id
+    }
     if (status) query.status = status
     if (source) query.source = source
 
@@ -37,15 +51,23 @@ const getLeads = async (req, res) => {
 // @access  Private (Admin)
 const updateLead = async (req, res) => {
   try {
+    let update = req.body
+    if (req.user && req.user.role === 'agent') {
+      const me = await Agent.findOne({ user: req.user._id })
+      const own = me && await Lead.exists({ _id: req.params.id, assignedAgent: me._id })
+      if (!own) return res.status(403).json({ success: false, message: 'This lead is not assigned to you' })
+      update = {}
+      ;['status', 'notes', 'followUpAt'].forEach(k => { if (req.body[k] !== undefined) update[k] = req.body[k] })
+    }
     const lead = await Lead.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      update,
       { new: true, runValidators: true }
     )
     if (!lead) {
       return res.status(404).json({ success: false, message: 'Lead not found' })
     }
-    const changes = Object.keys(req.body).map(k => (k === 'status' ? `status → ${req.body.status}` : k)).join(', ')
+    const changes = Object.keys(update).map(k => (k === 'status' ? `status → ${update.status}` : k)).join(', ')
     logActivity(req, 'updated', 'lead', `${lead.name}: ${changes}`)
     res.json({ success: true, data: lead })
   } catch (error) {

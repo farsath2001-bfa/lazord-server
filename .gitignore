@@ -1,6 +1,9 @@
 # Dependencies
 node_modules
 
+# Database backups (contain customer data)
+backups/
+
 # Environment variables — NEVER push these!
 .env
 .env.local

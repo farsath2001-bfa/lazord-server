@@ -12,7 +12,8 @@ const agentSchema = new mongoose.Schema({
   speciality: { type: String, trim: true, default: '' },
   areas: [{ type: String, trim: true }],
   order: { type: Number, default: 0 },
-  active: { type: Boolean, default: true }
+  active: { type: Boolean, default: true },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null }
 }, { timestamps: true })
 
 module.exports = mongoose.model('Agent', agentSchema)
