@@ -29,6 +29,8 @@ const allowedOrigins = [
 app.use(cors({
   origin: (origin, cb) => {
     if (!origin || allowedOrigins.includes(origin)) return cb(null, true)
+    // Any local dev port (Vite moves to 5174, 5175... when 5173 is busy)
+    if (/^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin)) return cb(null, true)
     return cb(null, false)
   },
   credentials: true
