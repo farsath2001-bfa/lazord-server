@@ -78,7 +78,10 @@ const callClaude = async (system, messages) => {
     headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
     body: JSON.stringify({ model: MODEL, max_tokens: 500, system, messages, tools })
   })
-  if (!r.ok) throw new Error(`Anthropic API ${r.status}`)
+  if (!r.ok) {
+    const body = await r.text().catch(() => '')
+    throw new Error(`Anthropic API ${r.status} (model ${MODEL}): ${body.slice(0, 300)}`)
+  }
   return r.json()
 }
 
