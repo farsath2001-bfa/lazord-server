@@ -16,6 +16,8 @@ const chatLimiter = rateLimit({
   legacyHeaders: false,
   message: { success: false, code: 'busy', message: 'Too many messages, please try again in a few minutes' }
 })
+// When Anthropic rejects us (no credits, bad key) the widget switches to guided mode for a while
+let downUntil = 0
 let day = ''
 let used = 0
 const underDailyCap = () => {
@@ -79,6 +81,7 @@ const callClaude = async (system, messages) => {
     body: JSON.stringify({ model: MODEL, max_tokens: 500, system, messages, tools })
   })
   if (!r.ok) {
+    if ([400, 401, 402, 403].includes(r.status)) downUntil = Date.now() + 5 * 60 * 1000
     const body = await r.text().catch(() => '')
     throw new Error(`Anthropic API ${r.status} (model ${MODEL}): ${body.slice(0, 300)}`)
   }
@@ -99,6 +102,11 @@ const saveLead = async (req, input) => {
   logActivity(req, 'received', 'lead', `${lead.name} (AI chat)`)
   return 'Saved. An advisor will contact the visitor soon.'
 }
+
+// @route GET /api/chat/status — tells the widget whether AI answers are available
+router.get('/status', (req, res) => {
+  res.json({ success: true, ai: Boolean(process.env.ANTHROPIC_API_KEY) && Date.now() > downUntil })
+})
 
 // @route POST /api/chat   body: { messages: [{ role, content }], lang }
 router.post('/', chatLimiter, async (req, res) => {
